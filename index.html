@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Game Spin & Win - 10 Games</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,Arial}
+body{background:#0f1014;color:#fff;min-height:100vh}
+header{background:linear-gradient(135deg,#7c3aed,#ec4899);padding:20px;text-align:center}
+.coins{background:#1f1f23;display:inline-block;padding:8px 18px;border-radius:20px;margin-top:12px;font-weight:bold;border:1px solid #333}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:15px;max-width:700px;margin:0 auto}
+.card{background:#1c1c20;border:1px solid #2a2a30;border-radius:16px;padding:16px;text-align:center;cursor:pointer}
+.card.icon{font-size:32px}
+#gameArea{display:none;position:fixed;inset:0;background:#0f1014;z-index:99;overflow:auto;padding:15px}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px}
+.back{background:#2a2a30;border:none;color:#fff;padding:10px 18px;border-radius:10px}
+.game-box{background:#1c1c20;border:1px solid #2a2a30;border-radius:20px;padding:20px;max-width:500px;margin:0 auto;text-align:center;min-height:400px}
+button.action{background:linear-gradient(135deg,#7c3aed,#ec4899);border:none;color:#fff;padding:14px 30px;border-radius:30px;font-size:18px;font-weight:bold;cursor:pointer;margin-top:15px;width:100%}
+input{width:100%;padding:12px;border-radius:10px;border:1px solid #333;background:#111;color:#fff;font-size:18px;text-align:center;margin-top:10px}
+#wheel{width:260px;height:260px;border-radius:50%;margin:20px auto;border:6px solid #fff;background:conic-gradient(#ff4757 0 60deg,#ffa502 60deg 120deg,#2ed573 120deg 180deg,#1e90ff 180deg 240deg,#a55eea 240deg 300deg,#ff6b81 300deg 360deg);transition:transform 3.5s cubic-bezier(.17,.67,.12,.99)}
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:15px}
+.mem-card{aspect-ratio:1;background:#2a2a30;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:24px;cursor:pointer}
+.box-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:15px}
+.lbox{aspect-ratio:1;background:#2a2a30;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:32px;cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+<h1>🎮 Game Spin & Win</h1>
+<p>10 गेम · वर्चुअल कॉइन्स · कस्टम सेटिंग्स</p>
+<div class="coins">🪙 Coins: <span id="coinCount">100</span></div>
+</header>
+<div class="grid">
+<div class="card" onclick="openGame('spin')"><div class="icon">🎡</div><h3>Spin & Win</h3></div>
+<div class="card" onclick="openGame('number')"><div class="icon">🔢</div><h3>Number Guess</h3></div>
+<div class="card" onclick="openGame('memory')"><div class="icon">🧠</div><h3>Memory Match</h3></div>
+<div class="card" onclick="openGame('tap')"><div class="icon">👆</div><h3>Tap Challenge</h3></div>
+<div class="card" onclick="openGame('dice')"><div class="icon">🎲</div><h3>Dice Roll</h3></div>
+<div class="card" onclick="openGame('quiz')"><div class="icon">❓</div><h3>Mini Quiz</h3></div>
+<div class="card" onclick="openGame('higher')"><div class="icon">📈</div><h3>Higher / Lower</h3></div>
+<div class="card" onclick="openGame('lucky')"><div class="icon">🎁</div><h3>Lucky Box</h3></div>
+<div class="card" onclick="openGame('rps')"><div class="icon">✊</div><h3>Rock Paper Scissors</h3></div>
+<div class="card" onclick="openGame('math')"><div class="icon">➗</div><h3>Quick Math</h3></div>
+</div>
+<div id="gameArea">
+<div class="topbar"><button class="back" onclick="closeGame()">← Back</button><div>🪙 <span id="coinCount2">100</span></div></div>
+<div class="game-box" id="gameBox"></div>
+</div>
+<script>
+let coins=parseInt(localStorage.getItem('coins')||'100');
+function updateCoins(n){coins+=n;localStorage.setItem('coins',coins);document.getElementById('coinCount').innerText=coins;document.getElementById('coinCount2').innerText=coins}
+document.getElementById('coinCount').innerText=coins;
+function openGame(id){document.getElementById('gameArea').style.display='block';document.getElementById('coinCount2').innerText=coins;
+if(id==='spin')loadSpin();if(id==='number')loadNumber();if(id==='memory')loadMemory();if(id==='tap')loadTap();if(id==='dice')loadDice();if(id==='quiz')loadQuiz();if(id==='higher')loadHigher();if(id==='lucky')loadLucky();if(id==='rps')loadRPS();if(id==='math')loadMath();}
+function closeGame(){document.getElementById('gameArea').style.display='none'}
+function loadSpin(){let deg=0;document.getElementById('gameBox').innerHTML=`<h2>🎡 Spin & Win</h2><p>Cost: 10 coins</p><div id="wheel"></div><button class="action" onclick="doSpin()">SPIN NOW</button><h3 id="res" style="margin-top:15px;color:#2ed573"></h3>`;window.doSpin=()=>{if(coins<10){alert('Coins kam hai!');return}updateCoins(-10);let extra=1800+Math.random()*360;deg+=extra;document.getElementById('wheel').style.transform=`rotate(${deg}deg)`;document.getElementById('res').innerText='Spinning...';setTimeout(()=>{let prizes=[10,20,0,50,100,5];let idx=Math.floor(Math.random()*6);updateCoins(prizes[idx]);document.getElementById('res').innerText=prizes[idx]==0?'Try Again!':'Won '+prizes[idx]+' coins! 🎉';},3600);}}
+function loadNumber(){let num=Math.floor(Math.random()*100)+1,tries=7;document.getElementById('gameBox').innerHTML=`<h2>🔢 Number Guess (1-100)</h2><p>${tries} tries left</p><input id="numIn" type="number" placeholder="Number likho"><button class="action" onclick="checkNum()">Guess</button><h3 id="res"></h3>`;window.checkNum=()=>{let g=parseInt(document.getElementById('numIn').value);if(!g)return;tries--;let r=document.getElementById('res');if(g===num){updateCoins(30);r.innerText='Correct! +30 coins 🎉';setTimeout(loadNumber,1500);}else if(tries==0){r.innerText='Game Over! Number tha '+num;setTimeout(loadNumber,2000);}else{r.innerText=g>num?'Too High! '+tries+' left':'Too Low! '+tries+' left'}}}
+function loadMemory(){let em=['🍎','🍎','🍌','🍌','🍇','🍇','🍓','🍓','🍉','🍉','🍒','🍒','🥝','🥝','🍍','🍍'];em.sort(()=>Math.random()-.5);let first=null,lock=false,matched=0;let html='<h2>🧠 Memory Match</h2><div class="mem-grid" id="mgrid"></div><h3 id="res"></h3>';document.getElementById('gameBox').innerHTML=html;let grid=document.getElementById('mgrid');em.forEach((e,i)=>{let d=document.createElement('div');d.className='mem-card';d.dataset.v=e;d.innerText='?';d.onclick=()=>{if(lock||d.classList.contains('open'))return;d.innerText=e;d.classList.add('open');d.style.background='#7c3aed';if(!first){first=d}else{lock=true;if(first.dataset.v===d.dataset.v){matched+=2;first=null;lock=false;if(matched==16){updateCoins(25);document.getElementById('res').innerText='+25 coins Won! 🎉'}}else{setTimeout(()=>{first.innerText='?';d.innerText='?';first.classList.remove('open');d.classList.remove('open');first.style.background='#2a2a30';d.style.background='#2a2a30';first=null;lock=false},800)}}};grid.appendChild(d);})}
+function loadTap(){let c=0,time=10;document.getElementById('gameBox').innerHTML=`<h2>👆 Tap Challenge</h2><h1 id="tcount" style="font-size:60px">${c}</h1><p id="ttime">${time}s</p><button class="action" id="tapBtn">TAP FAST!</button><h3 id="res"></h3>`;let btn=document.getElementById('tapBtn'),interval=null;btn.onclick=()=>{if(!interval){interval=setInterval(()=>{time--;document.getElementById('ttime').innerText=time+'s';if(time<=0){clearInterval(interval);let won=Math.floor(c/2);updateCoins(won);document.getElementById('res').innerText='Time Up! +'+won+' coins';}},1000)}c++;document.getElementById('tcount').innerText=c;}}
+function loadDice(){document.getElementById('gameBox').innerHTML=`<h2>🎲 Dice Roll</h2><p>6 aaye to +30 coins</p><div style="font-size:80px" id="dice">🎲</div><button class="action" onclick="rollDice()">Roll Dice</button><h3 id="res"></h3>`;window.rollDice=()=>{let n=Math.floor(Math.random()*6)+1;document.getElementById('dice').innerText=n;if(n==6){updateCoins(30);document.getElementById('res').innerText='Jackpot! +30 coins 🎉'}else{document.getElementById('res').innerText='You got '+n}}}
+function loadQuiz(){let qs=[{q:'India ki capital?',o:['Mumbai','Delhi','Kolkata'],a:1},{q:'2+2*2 =?',o:['6','8','4'],a:0},{q:'Sun kahan se nikalta hai?',o:['West','East','North'],a:1}];let idx=Math.floor(Math.random()*qs.length);let q=qs[idx];document.getElementById('gameBox').innerHTML=`<h2>❓ Mini Quiz</h2><h3 style="margin:15px 0">${q.q}</h3>${q.o.map((op,i)=>`<button class="action" style="margin-top:8px;background:#2a2a30" onclick="ansQuiz(${i})">${op}</button>`).join('')}<h3 id="res"></h3>`;window.ansQuiz=(i)=>{if(i==q.a){updateCoins(20);document.getElementById('res').innerText='Correct! +20 coins'}else{document.getElementById('res').innerText='Wrong! Correct: '+q.o[q.a]};setTimeout(loadQuiz,1500)}}
+function loadHigher(){let cur=Math.floor(Math.random()*50)+1;document.getElementById('gameBox').innerHTML=`<h2>📈 Higher / Lower</h2><h1 style="font-size:50px" id="hnum">${cur}</h1><p>Next Higher ya Lower?</p><div style="display:flex;gap:10px"><button class="action" onclick="checkHigh(true)">Higher</button><button class="action" onclick="checkHigh(false)">Lower</button></div><h3 id="res"></h3>`;window.checkHigh=(isHigh)=>{let next=Math.floor(Math.random()*50)+1;let win=(isHigh&&next>cur)||(!isHigh&&next<cur);document.getElementById('hnum').innerText=next;if(win&&next!=cur){updateCoins(15);document.getElementById('res').innerText='Correct! +15 coins'}else if(next==cur){document.getElementById('res').innerText='Draw!'}else{document.getElementById('res').innerText='Wrong! '+next};cur=next;}}
+function loadLucky(){document.getElementById('gameBox').innerHTML=`<h2>🎁 Lucky Box</h2><p>Ek box chuno!</p><div class="box-grid">${[0,1,2,3,4,5,6,7,8].map(i=>`<div class="lbox" onclick="openBox(${i})">🎁</div>`).join('')}</div><h3 id="res"></h3>`;window.openBox=(i)=>{let win=Math.floor(Math.random()*40);let boxes=document.querySelectorAll('.lbox');boxes[i].innerText='🪙'+win;updateCoins(win);document.getElementById('res').innerText='You got '+win+' coins!';boxes.forEach(b=>b.style.pointerEvents='none');setTimeout(loadLucky,2000);}}
+function loadRPS(){document.getElementById('gameBox').innerHTML=`<h2>✊ Rock Paper Scissors</h2><div style="display:flex;gap:8px;margin-top:15px"><button class="action" onclick="playRPS('rock')">Rock</button><button class="action" onclick="playRPS('paper')">Paper</button><button class="action" onclick="playRPS('scissor')">Scissor</button></div><h3 id="res" style="margin-top:15px"></h3><h2 id="comp"></h2>`;window.playRPS=(p)=>{let ch=['rock','paper','scissor'];let c=ch[Math.floor(Math.random()*3)];document.getElementById('comp').innerText='Computer: '+c;let r=document.getElementById('res');if(p==c){r.innerText='Draw!'}else if((p=='rock'&&c=='scissor')||(p=='paper'&&c=='rock')||(p=='scissor'&&c=='paper')){updateCoins(15);r.innerText='You Win! +15 coins 🎉'}else{r.innerText='You Lose!'}}}
+function loadMath(){let a=Math.floor(Math.random()*20)+1,b=Math.floor(Math.random()*20)+1;document.getElementById('gameBox').innerHTML=`<h2>➗ Quick Math</h2><h1 style="font-size:40px">${a} + ${b} =?</h1><input id="mathIn" type="number" placeholder="Answer"><button class="action" onclick="checkMath(${a+b})">Submit</button><h3 id="res"></h3>`;window.checkMath=(ans)=>{let g=parseInt(document.getElementById('mathIn').value);if(g==ans){updateCoins(10);document.getElementById('res').innerText='Correct! +10 coins 🎉';setTimeout(loadMath,1000)}else{document.getElementById('res').innerText='Wrong! Answer '+ans}}}
+</script>
+</body>
+</html>
